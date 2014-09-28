@@ -11,9 +11,19 @@
 
   angular.module('gilbox.kapiScroll', []).factory('rekapi', function($document) {
     return new Rekapi($document[0].body);
-  }).directive('kapiScroll', function(rekapi, $window) {
+  }).constant('kapiFormulas', {
+    top: function(element, container, rect, containerRect, offset) {
+      return ~~(rect.top - containerRect.top + offset);
+    },
+    center: function(element, container, rect, containerRect, offset) {
+      return ~~(rect.top - containerRect.top - container.clientHeight / 2 + offset);
+    },
+    bottom: function(element, container, rect, containerRect, offset) {
+      return ~~(rect.top - containerRect.top - container.clientHeight + offset);
+    }
+  }).directive('kapiScroll', function(rekapi, $window, kapiFormulas) {
     return function(scope, element, attr) {
-      var actionFrameIdx, actionFrames, actionPropKeys, actionProps, actions, actionsUpdate, actor, animationFrame, dashersize, ksWatchCancel, prevScrollY, scrollY, update, updating, y;
+      var actionFrameIdx, actionFrames, actionPropKeys, actionProps, actions, actionsUpdate, actor, animationFrame, container, dashersize, ksWatchCancel, prevScrollY, scrollY, update, updating, y;
       actor = rekapi.addActor({
         context: element[0]
       });
@@ -22,6 +32,7 @@
       scrollY = 0;
       animationFrame = new AnimationFrame();
       updating = false;
+      container = document.documentElement;
       actionProps = {
         'onUp': {
           up: function() {
@@ -112,7 +123,7 @@
         return str.replace(/\W+/g, '-').replace(/([a-z\d])([A-Z])/g, '$1-$2').toLowerCase();
       };
       ksWatchCancel = scope.$watch(attr.kapiScroll, function(data) {
-        var actionCount, actionProp, dprop, ease, elmEase, keyFrame, kfEase, o, prop, val, _i, _len;
+        var actionCount, actionProp, c, containerRect, dprop, ease, elmEase, keyFrame, kfEase, o, offset, parts, prop, rect, val, variable, _i, _len;
         if (!data) {
           return;
         }
@@ -123,8 +134,17 @@
         delete data.ease;
         actions = {};
         actionFrames = [];
+        rect = element[0].getBoundingClientRect();
+        containerRect = container.getBoundingClientRect();
         for (scrollY in data) {
           keyFrame = data[scrollY];
+          c = scrollY.charCodeAt(0);
+          if (c < 48 || c > 57) {
+            parts = scrollY.match(/^(\w+)(.*)$/);
+            variable = parts[1];
+            offset = ~~parts[2];
+            scrollY = kapiFormulas[variable](element, container, rect, containerRect, offset);
+          }
           actionCount = 0;
           for (_i = 0, _len = actionPropKeys.length; _i < _len; _i++) {
             actionProp = actionPropKeys[_i];
@@ -163,7 +183,10 @@
             }
           }
           actor.keyframe(scrollY, keyFrame, ease);
+          console.log("keyframe-->scrollY, keyFrame, ease", scrollY, keyFrame, ease);
         }
+        console.log("-->actions", actions);
+        console.log("-->actionFrames", actionFrames);
         actionFrames.sort(function(a, b) {
           return a > b;
         });

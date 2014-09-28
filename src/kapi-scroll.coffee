@@ -12,7 +12,34 @@
 
   angular.module('gilbox.kapiScroll', [])
     .factory 'rekapi', ($document) -> new Rekapi($document[0].body)
-    .directive 'kapiScroll', (rekapi, $window) ->
+
+    .constant 'kapiFormulas', {
+
+      # formulas are always in the format: variable or variable<offset>
+      #   (note that you cannot combine formula variables)
+      # for example:
+      #
+      #      top+40
+      #      top-120
+      #      top
+      #      center
+      #      center-111
+      #
+      # are valid formulas. (top40 is valid as well but less intuitive)
+      #
+      # each property of the sparkFormulas object is a formula variable
+
+      # top of the element hits the top of the viewport
+      top: (element, container, rect, containerRect, offset) ->  ~~(rect.top - containerRect.top + offset)
+
+      # top of the element hits the center of the viewport
+      center: (element, container, rect, containerRect, offset) ->  ~~(rect.top - containerRect.top - container.clientHeight/2 + offset)
+
+      # top of the element hits the bottom of the viewport
+      bottom: (element, container, rect, containerRect, offset) ->  ~~(rect.top - containerRect.top - container.clientHeight + offset)
+    }
+
+    .directive 'kapiScroll', (rekapi, $window, kapiFormulas) ->
       (scope, element, attr) ->
         actor = rekapi.addActor({ context: element[0] })
         y = 0
@@ -20,6 +47,8 @@
         scrollY = 0
         animationFrame = new AnimationFrame()
         updating = false
+
+        container = document.documentElement
 
         actionProps = {
 
@@ -119,8 +148,23 @@
           actions = {}
           actionFrames = []
 
+          # this is used for formula comprehension... a possible performance improvement might
+          # forgo these calculations by adding some option or deferring calculation automatically
+          rect = element[0].getBoundingClientRect()
+          containerRect = container.getBoundingClientRect()
+
           # setup the rekapi keyframes
           for scrollY, keyFrame of data
+
+            # formula comprehension
+            # when scrollY first char is not a digit, we assume this is a formula
+            c = scrollY.charCodeAt(0)
+            if (c < 48 or c > 57)
+#              keyFrame.formula = scrollY # we could possibly support this by adding a check below that skips it for rekapi
+              parts = scrollY.match(/^(\w+)(.*)$/)
+              variable = parts[1]
+              offset = ~~parts[2]
+              scrollY = kapiFormulas[variable](element, container, rect, containerRect, offset)
 
             actionCount = 0
 
@@ -157,6 +201,12 @@
               delete keyFrame[prop] if prop != dprop
 
             actor.keyframe(scrollY, keyFrame, ease)
+            console.log "keyframe-->scrollY, keyFrame, ease", scrollY, keyFrame, ease
+
+
+
+          console.log "-->actions", actions
+          console.log "-->actionFrames", actionFrames
 
 
           actionFrames.sort (a,b) -> a > b
