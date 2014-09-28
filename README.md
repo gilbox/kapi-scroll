@@ -39,3 +39,19 @@ Usage
  ```
  
 The title will use `easeOutQuad` in all cases except for the scroll position range [`121`, `141`]
+
+
+## Formulas
+
+```html
+<h1 kapi-scroll="::{
+    ease:'easeOutQuad',
+       'top+10':{opacity:'0'},
+         center:{opacity:'0.8', top:'151px', color:'#fff'},
+    'bottom-10':{opacity:'1.0', top:'0px', color:'#444', ease: 'linear'}
+    }">
+  This Title is Kapimated
+</h1>
+ ```
+ 
+ Learn more about formulas at [spark-scroll](https://github.com/gilbox/kapi-scroll)
