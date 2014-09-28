@@ -11,11 +11,12 @@
     return new Rekapi($document[0].body);
   }).directive('kapiScroll', function(rekapi, $window) {
     return function(scope, element, attr) {
-      var actionFrameIdx, actionFrames, actionPropKeys, actionProps, actions, actionsUpdate, actor, animationFrame, dashersize, ksWatchCancel, scrollY, update, updating, y;
+      var actionFrameIdx, actionFrames, actionPropKeys, actionProps, actions, actionsUpdate, actor, animationFrame, dashersize, ksWatchCancel, prevScrollY, scrollY, update, updating, y;
       actor = rekapi.addActor({
         context: element[0]
       });
       y = 0;
+      prevScrollY = 0;
       scrollY = 0;
       animationFrame = new AnimationFrame();
       updating = false;
@@ -56,8 +57,8 @@
       actionFrames = [];
       actionFrameIdx = -1;
       actionsUpdate = function() {
-        var actionProp, c, d, idx, prop, _results;
-        d = scrollY - y;
+        var actionProp, c, d, idx, prop;
+        d = scrollY - prevScrollY;
         if (d < 0 && actionFrameIdx >= 0) {
           idx = actionFrameIdx >= actionFrames.length ? actionFrameIdx - 1 : actionFrameIdx;
           while (idx >= 0 && y < actionFrames[idx]) {
@@ -73,7 +74,6 @@
         }
         if (d >= 0 && actionFrameIdx < actionFrames.length) {
           idx = actionFrameIdx < 0 ? 0 : actionFrameIdx;
-          _results = [];
           while (idx < actionFrames.length && y > actionFrames[idx]) {
             c = actions[actionFrames[idx]];
             for (prop in c) {
@@ -82,14 +82,14 @@
                 actionProp.down.apply(c);
               }
             }
-            _results.push(actionFrameIdx = ++idx);
+            actionFrameIdx = ++idx;
           }
-          return _results;
         }
+        return prevScrollY = scrollY;
       };
-      actionsUpdate = _.debounce(actionsUpdate, 33, {
+      actionsUpdate = _.debounce(actionsUpdate, 66, {
         leading: true,
-        maxWait: 33
+        maxWait: 66
       });
       update = function() {
         var ad, d;
@@ -162,7 +162,7 @@
         actionFrames.sort(function(a, b) {
           return a > b;
         });
-        y = scrollY = $window.scrollY;
+        y = prevScrollY = scrollY = $window.scrollY;
         update();
         return actionsUpdate();
       }, true);
