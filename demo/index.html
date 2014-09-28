@@ -19,10 +19,10 @@
                    ease:'easeOutQuad',
                       0:  { color:'#000', marginLeft: '0px' },
                       50: { onDown: app.downFn },
-                      75: { color:'#00f', marginLeft: '0px', class: 'my-thing' },
-                      120:{ classUp: 'my-thing' },
-                      140:{ onUp: app.upFn },
-                      150:{ color:'#f00', marginLeft: '100px' }
+                      75: { color:'#00f', marginLeft: '0px', downAddClass: 'my-thing', upRemoveClass: 'my-thing' },
+                      150:{ upAddClass: 'my-thing', downRemoveClass: 'my-thing' },
+                      170:{ onUp: app.upFn },
+                      190:{ color:'#f00', marginLeft: '100px' }
                    }" kapi-scroll-bind-once>
     kapi-scroll for AngularJS
   </h1>

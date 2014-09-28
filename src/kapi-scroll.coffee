@@ -7,6 +7,8 @@
     # the same as above applies
     _ = window._ or (if require.defined('lodash') then require('lodash') else require('underscore'))
     AnimationFrame = window.AnimationFrame or (if require.defined('animationFrame') then require('animationFrame') else require('AnimationFrame'))
+  else
+    [Rekapi, _, AnimationFrame] = [window.Rekapi, window._, window.AnimationFrame]
 
   angular.module('gilbox.kapiScroll', [])
     .factory 'rekapi', ($document) -> new Rekapi($document[0].body)
@@ -101,7 +103,7 @@
 
         # automatic conversion from camelCase to dashed-case
         dashersize = (str) ->
-          str.replace(/\W+/g, '-').replace(/([a-z\d])([A-Z])/g, '$1-$2')
+          str.replace(/\W+/g, '-').replace(/([a-z\d])([A-Z])/g, '$1-$2').toLowerCase()
 
 
         ksWatchCancel = scope.$watch attr.kapiScroll, (data) ->
@@ -146,14 +148,17 @@
             # comprehension of array-notation for easing
             # (will override or fall back to keyframe ease propery as needed)
             for prop, val of keyFrame
-              prop = dashersize(prop)
+              dprop = dashersize(prop)
               val = [val, kfEase] if not angular.isArray(val)
               o = {}
-              o[prop] = val[1]
+              o[dprop] = val[1]
               angular.extend(ease, o)
-              keyFrame[prop] = val[0]
+              keyFrame[dprop] = val[0]
+              delete keyFrame[prop] if prop != dprop
 
             actor.keyframe(scrollY, keyFrame, ease)
+            console.log "-->keyFrame", keyFrame
+
 
           actionFrames.sort (a,b) -> a > b
 

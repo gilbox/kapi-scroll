@@ -1,10 +1,12 @@
 (function() {
-  var AnimationFrame, Rekapi, _;
+  var AnimationFrame, Rekapi, _, _ref;
 
   if (typeof define === 'function' && define.amd) {
     Rekapi = window.Rekapi || require('rekapi');
     _ = window._ || (require.defined('lodash') ? require('lodash') : require('underscore'));
     AnimationFrame = window.AnimationFrame || (require.defined('animationFrame') ? require('animationFrame') : require('AnimationFrame'));
+  } else {
+    _ref = [window.Rekapi, window._, window.AnimationFrame], Rekapi = _ref[0], _ = _ref[1], AnimationFrame = _ref[2];
   }
 
   angular.module('gilbox.kapiScroll', []).factory('rekapi', function($document) {
@@ -107,10 +109,10 @@
         }
       };
       dashersize = function(str) {
-        return str.replace(/\W+/g, '-').replace(/([a-z\d])([A-Z])/g, '$1-$2');
+        return str.replace(/\W+/g, '-').replace(/([a-z\d])([A-Z])/g, '$1-$2').toLowerCase();
       };
       ksWatchCancel = scope.$watch(attr.kapiScroll, function(data) {
-        var actionCount, actionProp, ease, elmEase, keyFrame, kfEase, o, prop, val, _i, _len;
+        var actionCount, actionProp, dprop, ease, elmEase, keyFrame, kfEase, o, prop, val, _i, _len;
         if (!data) {
           return;
         }
@@ -148,16 +150,20 @@
           }
           for (prop in keyFrame) {
             val = keyFrame[prop];
-            prop = dashersize(prop);
+            dprop = dashersize(prop);
             if (!angular.isArray(val)) {
               val = [val, kfEase];
             }
             o = {};
-            o[prop] = val[1];
+            o[dprop] = val[1];
             angular.extend(ease, o);
-            keyFrame[prop] = val[0];
+            keyFrame[dprop] = val[0];
+            if (prop !== dprop) {
+              delete keyFrame[prop];
+            }
           }
           actor.keyframe(scrollY, keyFrame, ease);
+          console.log("-->keyFrame", keyFrame);
         }
         actionFrames.sort(function(a, b) {
           return a > b;
