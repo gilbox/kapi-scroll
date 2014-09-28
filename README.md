@@ -54,4 +54,4 @@ The title will use `easeOutQuad` in all cases except for the scroll position ran
 </h1>
  ```
  
- Learn more about formulas at [spark-scroll](https://github.com/gilbox/kapi-scroll)
+ Learn more about formulas at [spark-scroll](https://github.com/gilbox/spark-scroll)
