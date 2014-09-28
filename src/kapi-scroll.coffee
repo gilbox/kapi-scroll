@@ -22,39 +22,29 @@
 
           # When the up, down fns are called, `this` is the current keyFrame object
 
-          # keyframe onUp property
           # fn reference that is called when scrolled up past keyframe
           'onUp':
-            up: -> @onUp()
+            up: -> @onUp(@, 'onUp')
 
-          # keyframe onDown property
           # fn reference that is called when scrolled down past keyframe
           'onDown':
-            down: -> @onDown()
+            down: -> @onDown(@, 'onDown')
 
-          # keyframe class property
           # class(es) added when scrolled down past keyframe,
-          # but removed when scrolled up past keyframe
-          'class':
-            up: -> element.removeClass(this['class'])
-            down: -> element.addClass(this['class'])
+          'downAddClass':
+            down: -> element.addClass(@downAddClass)
 
-          # keyframe classUp property
           # class(es) added when scrolled up past keyframe,
-          # but removed when scrolled down past keyframe
-          'classUp':
-            up: -> element.addClass(@classUp)
-            down: -> element.removeClass(@classUp)
+          'upAddClass':
+            up: -> element.addClass(@upAddClass)
 
-          # keyframe classRemove property
           # class(es) removed when scrolled down past keyframe
-          'classRemove':
-            down: -> element.removeClass(@classRemove)
+          'downRemoveClass':
+            down: -> element.removeClass(@downRemoveClass)
 
-          # keyframe classUpRemove property
           # class(es) removed when scrolled up past keyframe
-          'classUpRemove':
-            up: -> element.removeClass(@classUpRemove)
+          'upRemoveClass':
+            up: -> element.removeClass(@upRemoveClass)
 
         }
         actionPropKeys = _.keys(actionProps)

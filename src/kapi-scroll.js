@@ -22,38 +22,32 @@
       actionProps = {
         'onUp': {
           up: function() {
-            return this.onUp();
+            return this.onUp(this, 'onUp');
           }
         },
         'onDown': {
           down: function() {
-            return this.onDown();
+            return this.onDown(this, 'onDown');
           }
         },
-        'class': {
-          up: function() {
-            return element.removeClass(this['class']);
-          },
+        'downAddClass': {
           down: function() {
-            return element.addClass(this['class']);
+            return element.addClass(this.downAddClass);
           }
         },
-        'classUp': {
+        'upAddClass': {
           up: function() {
-            return element.addClass(this.classUp);
-          },
-          down: function() {
-            return element.removeClass(this.classUp);
+            return element.addClass(this.upAddClass);
           }
         },
-        'classRemove': {
+        'downRemoveClass': {
           down: function() {
-            return element.removeClass(this.classRemove);
+            return element.removeClass(this.downRemoveClass);
           }
         },
-        'classUpRemove': {
+        'upRemoveClass': {
           up: function() {
-            return element.removeClass(this.classUpRemove);
+            return element.removeClass(this.upRemoveClass);
           }
         }
       };
