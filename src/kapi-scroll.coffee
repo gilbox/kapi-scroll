@@ -157,7 +157,6 @@
               delete keyFrame[prop] if prop != dprop
 
             actor.keyframe(scrollY, keyFrame, ease)
-            console.log "-->keyFrame", keyFrame
 
 
           actionFrames.sort (a,b) -> a > b

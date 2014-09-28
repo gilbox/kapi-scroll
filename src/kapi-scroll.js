@@ -163,7 +163,6 @@
             }
           }
           actor.keyframe(scrollY, keyFrame, ease);
-          console.log("-->keyFrame", keyFrame);
         }
         actionFrames.sort(function(a, b) {
           return a > b;
