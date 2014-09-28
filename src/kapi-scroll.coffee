@@ -14,6 +14,7 @@
       (scope, element, attr) ->
         actor = rekapi.addActor({ context: element[0] })
         y = 0
+        prevScrollY = 0
         scrollY = 0
         animationFrame = new AnimationFrame()
         updating = false
@@ -54,7 +55,7 @@
 
         actionsUpdate = ->
 
-          d = scrollY - y
+          d = scrollY - prevScrollY
 
           if d<0 and actionFrameIdx >= 0  # scroll up: don't apply on page load (only apply on page load for downward movement)
             idx = if (actionFrameIdx >= actionFrames.length) then actionFrameIdx-1 else actionFrameIdx
@@ -77,6 +78,8 @@
                 actionProp.down.apply(c) if actionProp.down
 
               actionFrameIdx = ++idx
+              
+          prevScrollY = scrollY
 
 
         actionsUpdate = _.debounce(actionsUpdate, 33, {leading: true, maxWait: 33})
@@ -154,7 +157,7 @@
 
           actionFrames.sort (a,b) -> a > b
 
-          y = scrollY = $window.scrollY
+          y = prevScrollY = scrollY = $window.scrollY
           update()
           actionsUpdate()
         , true  # deep watch
