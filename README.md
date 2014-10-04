@@ -3,6 +3,8 @@ kapi-scroll
 
 rekapi-based angular directive for scroll-based animations
 
+**DEPRECATION WARNING: All of the kapi-scroll features have been rolled into [`spark-scroll`](https://github.com/gilbox/spark-scroll). This project is abandoned**
+
 Setup
 =====
 
